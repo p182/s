@@ -1,0 +1,248 @@
+<html><head>
+<title>Random Searx Redirector</title>
+<link href="opensearch.xml" rel="search" title="Random Searx (local)" type="application/opensearchdescription+xml">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var urls;
+// List of Searx public instances. One per line. Keep formatting intact: '<host>',
+urls = [
+
+'search.anonymize.com',
+'search.mdosch.de',
+'search.snopyta.org',
+'searx.canox.net',
+'searx.decatec.de',
+'searx.dojocasts.com',
+'searx.handskemager.xyz',
+'searx.ir',
+'searx.lelux.fi',
+'searx.lynnesbian.space',
+'searx.nixnet.services',
+'searx.olymp.to',
+'searx.openhoofd.nl',
+'searx.openpandora.org',
+'searx.ouahpiti.info',
+'searx.pofilo.fr',
+'searx.privatenet.cf',
+'searx.prvcy.eu',
+'searx.rasp.fr',
+'searx.rxyz.rocks',
+'searx.tuxcloud.net',
+'searx.tyil.nl',
+'searx.xyz',
+'suche.mexmail.de',
+'unmonito.red',
+'www.searxs.eu'
+
+];
+newtls = [
+
+0,2,3,4,5,6,7,9,10,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,29,30,31,32
+
+];
+
+///// functions
+
+var altmode = false;
+
+cats = ['general','files','images','videos','it','map','music','news','science','social_media'];
+
+function getv(e)
+{
+	return document.getElementById(e).value;
+}
+
+function doSearx(s)
+{
+	var ti = s.match(/q=([^&]+)/);
+	if (ti)
+		document.title = 'Random Searx Redirecting... ' + decodeURIComponent(ti[1]);
+	else
+		return false;
+
+	var rng;
+	do {
+		rng = Math.floor(Math.random() * urls.length);
+		if (altmode == false) break;
+	} while (newtls.indexOf(rng) != -1);
+
+	var query = s.match(/q=.+/);
+	if (query != '')
+	{
+		// testen - lang unicode regex
+		var pref = '&theme=oscar&language=';
+		if (/[\u0400-\u04FF]/g.test(decodeURIComponent(s)))
+			pref += 'be-BY';
+		else if (/[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g.test(decodeURIComponent(s)))
+			pref += 'ja-JP';
+		else if (/[\uAC00-\uD7AF]/g.test(decodeURIComponent(s)))
+			pref += 'ko-KR';
+		else
+			pref += 'en';
+
+		/* exhibits broken behavior
+		if ((s.indexOf('!') == -1) && (s.replace('&category_general','').indexOf('&category_') == -1))
+			pref += '&engines=google,duckduckgo,qwant,ixquick,startpage'; */
+
+		window.location.href = 'https://' + urls[rng] + '/?' + query + pref;
+	}
+
+	return false;
+}
+
+function makeURI(q)
+{
+	var uri = document.location.href.match(/[^?#]+/);
+
+	if (altmode)
+		uri += '#alt';
+
+	if (q)
+		uri += '#q=' + encodeURIComponent(q);
+	else
+		uri += '#q=%s';
+
+	var tim = getv('time-range');
+	if (tim != '')
+		uri += '&time_range=' + tim;
+
+	for (var i=0;i<cats.length;i++)
+	{
+		var catc = document.getElementById('checkbox_' + cats[i]);
+		if (catc.checked)
+			uri += '&' + catc.name + '=on';
+	}
+
+	document.getElementById('bkmk').href = uri;
+
+	return uri;
+}
+
+function alte(s)
+{
+	if (s)
+	{
+		window.altmode = true;
+		document.getElementById('warn').innerHTML = 'This is intended only for older browsers without TLS 1.2 encryption and may be unsafe. <a href="#" onclick="alte(false);">Return</a>';
+	} else {
+		window.altmode = false;
+		document.getElementById('warn').innerHTML = '';
+	}
+	makeURI(false);
+	return false;
+}
+
+///// main
+
+if (window.location.href.indexOf('#alt') != -1)
+	altmode = true;
+
+if (window.location.href.indexOf('q=') != -1)
+	doSearx(window.location.href);
+
+</script>
+<style>
+
+input, button, body, select, option { font-family: Helvetica,Arial,sans-serif; }
+body { background-color: #FFF; margin: 0px; padding: 0px; }
+
+#searchbox { background-color: #FFF; padding: 4px 0px 0px; width: 100%; text-align: center; }
+#qbox { margin: 0px; margin-left: 3px; width: 99%; padding: 0px; border: none; border-collapse: collapse; }
+#qbox tr { border: 1px solid #666; }
+#qbox td { padding: 0px; }
+#qtd { width: 70%; background-color: #FFF; }
+#q { text-align: center; width: 100%; border: none; color: #444; background: transparent; height: 46px; font-size: 19px; padding: 10px 16px 10px; }
+#ttd { width: 10%; background-color: #FFF; }
+#time-range { margin: 5px; border: 1px solid #BBB; color: #666; background: transparent; padding: 4px 4px 4px; }
+#go { min-width: 110px; font-size: 16px; width: 100%; white-space: nowrap; border: none; height: 46px; }
+#gtd * { color: #FFF; background-color: #2ECC71; font-weight: bold; }
+#gtd *:hover { background-color: #01D7D4; color: #FFF; }
+input[type="checkbox"] { display: none; }
+input[type="checkbox"]:checked + label { color: #29314D; font-weight: 700; border-bottom: 5px solid #01D7D4; }
+label { min-width: 75px; color: #666; font-weight: bold; padding: 5px 0px 5px; display: inline-block; margin: 0px; margin-top: 4px; width: 9.5%; text-align: center; }
+label:hover { background-color: #01D7D4; color: #FFF; }
+
+.sp { border:1px solid #666; padding: 2px; font-size: 11px; }
+a { color: #017776; }
+#searchbox { position: absolute; top: 7%; }
+h2 { margin: 10px;}
+#t1 { position: absolute; left: 7%; top: 30%; margin: 5px; width: 77%; padding: 15px; }
+
+</style>
+<style>._3emE9--dark-theme .-S-tR--ff-downloader{background:rgba(30,30,30,.93);border:1px solid rgba(82,82,82,.54);box-shadow:0 4px 7px rgba(30,30,30,.55);color:#fff}._3emE9--dark-theme .-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn{background:#3d4b52}._3emE9--dark-theme .-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn:hover{background:#131415}._3emE9--dark-theme .-S-tR--ff-downloader ._10vpG--footer{background:rgba(30,30,30,.93)}._2mDEx--white-theme .-S-tR--ff-downloader{background:#fff;border:1px solid rgba(82,82,82,.54);box-shadow:0 4px 7px rgba(30,30,30,.55);color:#314c75}._2mDEx--white-theme .-S-tR--ff-downloader ._6_Mtt--header{font-weight:700}._2mDEx--white-theme .-S-tR--ff-downloader ._2dFLA--container ._2bWNS--notice{border:0;color:rgba(0,0,0,.88)}._2mDEx--white-theme .-S-tR--ff-downloader ._10vpG--footer{background:#fff}.-S-tR--ff-downloader{display:block;overflow:hidden;position:fixed;bottom:20px;right:7.1%;width:330px;height:180px;background:rgba(30,30,30,.93);border-radius:2px;color:#fff;z-index:99999999;border:1px solid rgba(82,82,82,.54);box-shadow:0 4px 7px rgba(30,30,30,.55);transition:.5s}.-S-tR--ff-downloader._3M7UQ--minimize{height:62px}.-S-tR--ff-downloader._3M7UQ--minimize .nxuu4--file-info,.-S-tR--ff-downloader._3M7UQ--minimize ._6_Mtt--header{display:none}.-S-tR--ff-downloader ._6_Mtt--header{padding:10px;font-size:17px;font-family:sans-serif}.-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn{float:right;background:#f1ecec;height:20px;width:20px;text-align:center;padding:2px;margin-top:-10px;cursor:pointer}.-S-tR--ff-downloader ._6_Mtt--header ._2VdJW--minimize-btn:hover{background:#e2dede}.-S-tR--ff-downloader ._13XQ2--error{color:red;padding:10px;font-size:12px;line-height:19px}.-S-tR--ff-downloader ._2dFLA--container{position:relative;height:100%}.-S-tR--ff-downloader ._2dFLA--container .nxuu4--file-info{padding:6px 15px 0;font-family:sans-serif}.-S-tR--ff-downloader ._2dFLA--container .nxuu4--file-info div{margin-bottom:5px;width:100%;overflow:hidden}.-S-tR--ff-downloader ._2dFLA--container ._2bWNS--notice{margin-top:21px;font-size:11px}.-S-tR--ff-downloader ._10vpG--footer{width:100%;bottom:0;position:absolute;font-weight:700}.-S-tR--ff-downloader ._10vpG--footer ._2V73d--loader{animation:n0BD1--rotation 3.5s linear forwards;position:absolute;top:-120px;left:calc(50% - 35px);border-radius:50%;border:5px solid #fff;border-top-color:#a29bfe;height:70px;width:70px;display:flex;justify-content:center;align-items:center}.-S-tR--ff-downloader ._10vpG--footer ._24wjw--loading-bar{width:100%;height:18px;background:#dfe6e9;border-radius:5px}.-S-tR--ff-downloader ._10vpG--footer ._24wjw--loading-bar ._1FVu9--progress-bar{height:100%;background:#8bc34a;border-radius:5px}.-S-tR--ff-downloader ._10vpG--footer ._2KztS--status{margin-top:10px}.-S-tR--ff-downloader ._10vpG--footer ._2KztS--status ._1XilH--state{float:left;font-size:.9em;letter-spacing:1pt;text-transform:uppercase;width:100px;height:20px;position:relative}.-S-tR--ff-downloader ._10vpG--footer ._2KztS--status ._1jiaj--percentage{float:right}</style></head>
+<body>
+
+<p><font color="red"></font></p><center><font color="red"><b><noscript>This page requires JavaScript. Click <a href="nojs.html">here for non-JS version</a>.</noscript><div id="warn"></div></b></font></center><p></p>
+
+<form action="javascript:void(0);" onsubmit="doSearx(makeURI(getv('q')));" onclick="makeURI(false);">
+<div id="searchbox">
+
+<table id="qbox" border="0">
+<tbody><tr>
+<td id="qtd">
+<input name="q" id="q" placeholder="Search for..." autocomplete="off" type="search" autofocus="">
+</td>
+<td id="ttd">
+<select name="time_range" id="time-range" class="custom-select form-control">
+<option id="time-range-anytime" value="" selected="selected">Anytime</option>
+<option id="time-range-day" value="day">Last day</option>
+<option id="time-range-week" value="week">Last week</option>
+<option id="time-range-month" value="month">Last month</option>
+<option id="time-range-year" value="year">Last year</option>
+
+</select>
+</td>
+<td id="gtd">
+<button default="" type="submit" id="go">Start search</button>
+</td>
+</tr>
+</tbody></table>
+<input id="checkbox_general" name="category_general" checked="checked" type="checkbox"><label for="checkbox_general">general</label>
+<input id="checkbox_files" name="category_files" type="checkbox"><label for="checkbox_files">files</label>
+<input id="checkbox_images" name="category_images" type="checkbox"><label for="checkbox_images">images</label>
+<input id="checkbox_videos" name="category_videos" type="checkbox"><label for="checkbox_videos">videos</label>
+<input id="checkbox_it" name="category_it" type="checkbox"><label for="checkbox_it">it</label>
+<input id="checkbox_map" name="category_map" type="checkbox"><label for="checkbox_map">map</label>
+<input id="checkbox_music" name="category_music" type="checkbox"><label for="checkbox_music">music</label>
+<input id="checkbox_news" name="category_news" type="checkbox"><label for="checkbox_news">news</label>
+<input id="checkbox_science" name="category_science" type="checkbox"><label for="checkbox_science">science</label>
+<input id="checkbox_social_media" name="category_social media" type="checkbox"><label for="checkbox_social_media">social</label>
+</div>
+</form>
+
+<!-- Tear along this line (optional) -->
+
+<div id="t1">
+<h2>Welcome to the Random <big><big><font color="#848688">sear</font><big><font color="#4EAD72">X</font></big></big></big> Redirector</h2>
+<a target="_blank" href="https://asciimoo.github.io/searx/">Searx</a> is
+ a metasearch engine that aggregates results from over seventy sources 
+while protecting the privacy of its users. This utility forwards your 
+search query to one of <script type="text/javascript">document.write(urls.length);</script>33 random volunteer-run public servers to thwart mass surveillance.<br>
+<div style="height: 123px;"><br></div>
+<small>
+<span class="sp"><a href="https://searx.neocities.org/#q=%s&amp;category_general=on" id="bkmk">Bookmark this link</a></span> (select categories above) and add a <a href="https://kb.mozillazine.org/Using_keyword_searches" title="Using keyword searches - MozillaZine Knowledge Base" target="_blank">keyword</a> for fast searching (e.g. <i>s &lt;query&gt;</i>).<br>
+You may also save this page to disk and use it offline or edit it with a text editor. <span class="sp"><a href="#alt" title="For browsers without TLS 1.2 support." onclick="alte(true);">Old browsers</a></span>
+<br><br>
+<b>Updated:</b> 2020/08/15 <small>(<a href="https://searx.neocities.org/changelog.html">changelog</a>)</small><br>
+<b>Public Searx instances in list <small>(<a href="https://searx.space/" target="_blank">source</a>)</small>:</b> <span class="sp"><a href="#" onclick="document.getElementById('slist').style.display = 'inline';">Show</a></span><br>
+<span id="slist" style="display:none;"><small>
+<script type="text/javascript">
+document.write(urls.toString().replace(/,/g,'<br>'));
+
+if (altmode)
+	alte(true);
+
+for (var i=0;i<cats.length;i++)
+{
+	if (document.location.href.indexOf('&category_' + cats[i] + '=on') != -1)
+		document.getElementById('checkbox_'+cats[i]).checked = true;
+}
+
+makeURI(false);
+</script>search.anonymize.com<br>search.mdosch.de<br>search.snopyta.org<br>searx.canox.net<br>searx.decatec.de<br>searx.dojocasts.com<br>searx.handskemager.xyz<br>searx.hardwired.link<br>searx.ir<br>searx.lelux.fi<br>searx.lynnesbian.space<br>searx.nixnet.services<br>searx.olymp.to<br>searx.openhoofd.nl<br>searx.openpandora.org<br>searx.ouahpiti.info<br>searx.pofilo.fr<br>searx.privatenet.cf<br>searx.prvcy.eu<br>searx.rasp.fr<br>searx.rxyz.rocks<br>searx.tuxcloud.net<br>searx.tyil.nl<br>searx.xyz<br>suche.mexmail.de<br>unmonito.red<br>www.searxs.eu</small><br></span>
+<br><a href="https://searx.neocities.org/nojs.html">Non-Javascript Version</a> | <a href="https://searx.neocities.org/instancescores.html">Instance Stats</a>
+</small>
+</div>
+
+
+</body></html>
