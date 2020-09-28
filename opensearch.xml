@@ -1,0 +1,9 @@
+<OpenSearchDescription>
+<ShortName>Random Searx</ShortName>
+<Description>Random Searx Redirector</Description>
+<InputEncoding>UTF-8</InputEncoding>
+<Url type="text/html" method="get" template="https://p182.github.io/s#">
+<Param name="q" value="{searchTerms}"/>
+<Param name="category_general" value="on"/>
+</Url>
+</OpenSearchDescription>
